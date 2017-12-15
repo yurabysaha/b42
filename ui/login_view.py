@@ -84,7 +84,12 @@ class LoginView:
             r = self.base.user.post(self.base.api_server + "/api-token-auth/", data=data)
 
             if r.status_code == 200:
-                self.base.current_user = r.json()
+                response = r.json()
+                if not response.get('actual'):
+                    messagebox.showerror("Need Update",
+                                         "You need update program. Visit our website and download new version")
+                    exit()
+                self.base.current_user = response
 
                 # Save remember if set
                 if self.remember_me_check.cget('text') == '[x]':

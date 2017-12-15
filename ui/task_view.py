@@ -152,7 +152,7 @@ class TaskView:
         self.active_tab.refresh_status()
 
     def start_task(self, event):
-        check_version = self.base.user.get(self.base.api_server + "/api/check_version?version=" + str(self.base.version_app)).json()
+        check_version = self.base.user.get(self.base.api_server + "/api/check_version?version=" + self.base.version_app).json()
         if check_version['actual']:
             self.start_task_btn.place_forget()
             self.pause_task_btn.place(x=20, y=120)
