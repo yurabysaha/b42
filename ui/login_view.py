@@ -115,10 +115,10 @@ class LoginView:
             messagebox.showerror("Error", "Server or internet connection problem")
 
     def register(self, event):
-        webbrowser.open(self.base.api_server + '/login')
+        webbrowser.open('http://yonchi.net.ua/login')
 
     def forgot_password(self, event):
-        webbrowser.open(self.base.api_server + '/login')
+        webbrowser.open('http://yonchi.net.ua/login')
 
     def focus_next_input(self, event):
         event.widget.tk_focusNext().focus()

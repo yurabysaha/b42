@@ -9,11 +9,11 @@ from ui.login_view import LoginView
 MAIN_BG = '#ffffff'
 
 # Need for disable console when close windows on Windows OS
-# sys.stderr = open('error.log', 'w')
-# sys.stdout = open('output.log', 'w')
+sys.stderr = open('error.log', 'w')
+sys.stdout = open('output.log', 'w')
 
 root = tk.Tk()
-root.title('YOnchi v 0.1')
+root.title('YOnchi v 0.2')
 # root.iconbitmap(default='img/logo.ico')
 root.configure(background=MAIN_BG)
 root.resizable(width=False, height=False)

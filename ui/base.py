@@ -14,7 +14,7 @@ class Base:
     def __init__(self, root):
         self.views_frame = {}
         self.root = root
-        self.version_app = 0.1
+        self.version_app = 0.2  # Change App version here!
         # self.api_server = 'http://127.0.0.1:8000'
         self.api_server = 'http://95.46.44.227'
 
