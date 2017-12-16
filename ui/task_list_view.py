@@ -1,5 +1,6 @@
 import tkinter as tk
 import json
+import webbrowser
 
 MAIN_BG = '#ffffff'
 
@@ -221,36 +222,52 @@ class TaskListView:
 class Notification:
     def __init__(self, root_window):
         self.body = root_window
-        self.single_notification_y_pos = 1
+        self.single_notification_y_pos = 24
 
     def display_or_close(self, event):
         if hasattr(self, 'notification_frame'):
             self.notification_frame.place_forget()
             delattr(self, 'notification_frame')
         else:
-            self.notification_frame = tk.Frame(self.body, bg='#f4f4f4', width=330, height=200)
+            self.notification_frame = tk.Frame(self.body, bg='#f4f4f4', width=330, height=300)
+            tk.Label(self.notification_frame, text='NOTIFICATIONS', fg='#b5b7b5', bg='#f4f4f4', font=('Helvetica', -14, 'bold'), padx=109).place(x=0, y=0)
             # tk.Label(self.notification_frame, text='No Notifications Yet!', fg='#b5b7b5', bg='#f4f4f4',
             #          font=('Helvetica', -18, 'bold')).place(x=80, y=80)
-            self.single_notification_y_pos = 1
-            self.display_new_notification('firsssssss')
-            self.display_new_notification('dsjdsjdjjfdjsf fdwhfjdf')
-            self.display_new_notification('fdfjdshfjkd ufha dshgf wfhwlfh kljwa')
+
+            self.more_notification_label = tk.Label(self.notification_frame, text='^', bg='#e7e7e7', font=('Helvetica', -24), padx=160)
+            self.more_notification_label.bind("<Enter>", self.show_more_notification)
+            self.more_notification_label.place(x=0, y=275)
+            self.single_notification_y_pos = 24
+
+            self.display_new_notification('Hi, you get your first 1000 points for work. More information on our website')
+            self.display_new_notification('Congratulation! You send 1000 requests for connect')
+            self.display_new_notification('Its your time to get discount 50% when you buy 10000 points')
+            self.display_new_notification('Congratulation! You send 1000 requests for connect')
+
             self.notification_frame.place(x=427, y=51)
 
-    def display_new_notification(self, text=''):
-        single_frame = tk.Frame(self.notification_frame, bg='#f4f4f4', width=330, height=50)
-        single_frame.place(x=1, y=self.single_notification_y_pos)
-        self.single_notification_y_pos += 50
+    def show_more_notification(self, event):
+        frame_more_notif = tk.Label(self.notification_frame, text='See all notifications on website', bg='#e7e7e7',
+                                    fg='#0f743a', font=('Helvetica', -15, 'underline'), cursor='hand2', padx=63, pady=20)
+        frame_more_notif.bind("<Leave>", lambda event, h=frame_more_notif: h.place_forget())
+        frame_more_notif.bind("<Button-1>", lambda event: webbrowser.open('http://yonchi.net.ua/login'))
+        frame_more_notif.place(x=0, y=245)
 
-        notif_text = tk.Label(single_frame, text=text)
+    def display_new_notification(self, text=''):
+        single_frame = tk.Frame(self.notification_frame, bg='#eae8e8', width=330, height=60)
+        single_frame.place(x=1, y=self.single_notification_y_pos)
+        self.single_notification_y_pos += 63
+
+        notif_text = tk.Label(single_frame, text=text, wraplength=300, bg='#eae8e8', justify='left')
         notif_text.place(x=5, y=5)
-        notif_read = tk.Label(single_frame, text='X', fg='red')
+        notif_read = tk.Label(single_frame, text='X', fg='red', bg='#eae8e8')
         notif_read.bind("<Button-1>", self.mark_as_read)
-        notif_read.place(x=300, y=2)
+        notif_read.place(x=305, y=2)
 
     def mark_as_read(self, event):
-        event.widget.master.place_forget()
-        self.single_notification_y_pos = 1
+        event.widget.master.destroy()
+        self.single_notification_y_pos = 24
         for wid in event.widget.master.master.winfo_children():
-            wid.place_configure(x=1, y=self.single_notification_y_pos)
-            self.single_notification_y_pos += 50
+            if wid.children.__len__() > 2:
+                wid.place_configure(x=1, y=self.single_notification_y_pos)
+                self.single_notification_y_pos += 63
