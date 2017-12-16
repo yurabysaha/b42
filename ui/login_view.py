@@ -85,7 +85,7 @@ class LoginView:
 
             if r.status_code == 200:
                 response = r.json()
-                if not response.get('actual'):
+                if not response.get('actual', True):
                     messagebox.showerror("Need Update",
                                          "You need update program. Visit our website and download new version")
                     exit()
