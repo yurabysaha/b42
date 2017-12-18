@@ -109,6 +109,8 @@ class LoginView:
 
                 self.base.user.headers['Authorization'] = 'Token ' + self.base.current_user['token']
                 self.base.stop_loading()
+
+                self.base.connect_to_socket()
                 self.base.change_view('TaskListView')
             else:
                 self.base.stop_loading()

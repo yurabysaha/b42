@@ -10,7 +10,7 @@ class TaskListView:
         self.base = base
         self.body = tk.Frame(self.base.root, bg=MAIN_BG)
         self.checkbox_items = {}
-        notification = Notification(self.body)
+        self.notification = Notification(self)
 
         self.base.views_frame['TaskListView'] = self
         self.body.place(x=0, y=0, width=768, height=680)
@@ -21,14 +21,14 @@ class TaskListView:
         # User profile and notifications
         self.my_profile_btn = tk.Label(self.body, text="MY PROFILE", bg="#919191", padx=40, pady=12, fg='white',
                                        font=('Helvetica', -14, 'bold'))
-        self.my_profile_btn.bind("<Button-1>", notification.display_or_close)
+        self.my_profile_btn.bind("<Button-1>", self.notification.display_or_close)
         self.my_profile_btn.bind("<Enter>", lambda event, h=self.my_profile_btn: h.configure(bg="#919191"))
         self.my_profile_btn.bind("<Leave>", lambda event, h=self.my_profile_btn: h.configure(bg="#919191"))
         self.my_profile_btn.place(x=540, y=5)
 
         self.notification_btn = tk.Label(self.body, text="0", bg="#919191", padx=16, pady=12, fg='white',
                                          font=('Helvetica', -14, 'bold'))
-        self.notification_btn.bind("<Button-1>", notification.display_or_close)
+        self.notification_btn.bind("<Button-1>", self.notification.display_or_close)
         self.notification_btn.bind("<Enter>", lambda event, h=self.notification_btn: h.configure(bg="#c1c1c1"))
         self.notification_btn.bind("<Leave>", lambda event, h=self.notification_btn: h.configure(bg="#919191"))
         self.notification_btn.place(x=713, y=5)
@@ -220,54 +220,118 @@ class TaskListView:
 
 
 class Notification:
+    """This class have functionality for displaying notifications"""
     def __init__(self, root_window):
-        self.body = root_window
+        """Init cls when call him
+
+        :param root_window : root window where notification frame will be present (self not self.body!)
+        """
+        self.parent_window = root_window
         self.single_notification_y_pos = 24
 
     def display_or_close(self, event):
+        """Display or close notification frame.
+
+        When user click on Notification button he can open or close notification frame.
+        So we verify if this frame already open and close him, or display frame if he
+        was closed.
+
+        """
         if hasattr(self, 'notification_frame'):
-            self.notification_frame.place_forget()
+            self.notification_frame.destroy()
             delattr(self, 'notification_frame')
         else:
-            self.notification_frame = tk.Frame(self.body, bg='#f4f4f4', width=330, height=300)
+            self.notification_frame = tk.Frame(self.parent_window.body, bg='#f4f4f4', width=330, height=300)
             tk.Label(self.notification_frame, text='NOTIFICATIONS', fg='#b5b7b5', bg='#f4f4f4', font=('Helvetica', -14, 'bold'), padx=109).place(x=0, y=0)
-            # tk.Label(self.notification_frame, text='No Notifications Yet!', fg='#b5b7b5', bg='#f4f4f4',
-            #          font=('Helvetica', -18, 'bold')).place(x=80, y=80)
 
-            self.more_notification_label = tk.Label(self.notification_frame, text='^', bg='#e7e7e7', font=('Helvetica', -24), padx=160)
+            self.update_notification_block()
+
+            self.more_notification_label = tk.Label(self.notification_frame, text='^', bg='#e7e7e7',
+                                                    font=('Helvetica', -24), padx=160)
             self.more_notification_label.bind("<Enter>", self.show_more_notification)
             self.more_notification_label.place(x=0, y=275)
             self.single_notification_y_pos = 24
-
-            self.display_new_notification('Hi, you get your first 1000 points for work. More information on our website')
-            self.display_new_notification('Congratulation! You send 1000 requests for connect')
-            self.display_new_notification('Its your time to get discount 50% when you buy 10000 points')
-            self.display_new_notification('Congratulation! You send 1000 requests for connect')
-
             self.notification_frame.place(x=427, y=51)
 
+    def update_notification_block(self):
+        """Method for rewrite all elements on notifications frame.
+
+        The results of this function will be displaying all unread notification or
+        Label 'No Notifications Yet!'
+        We verify at start if notification frame present on screen!
+        So we can use this method in other place safely!
+        """
+        if hasattr(self, 'notification_frame'):
+            for f in self.notification_frame.winfo_children():
+                if hasattr(f, 'id'):
+                    f.destroy()
+            if not self.parent_window.base.notifications_data:
+                tk.Label(self.notification_frame, text='No Notifications Yet!', fg='#b5b7b5', bg='#f4f4f4',
+                         font=('Helvetica', -18, 'bold')).place(x=80, y=80)
+            else:
+                for i in self.parent_window.base.notifications_data[:4]:
+                    self.display_new_notification(i)
+
     def show_more_notification(self, event):
+        """When user move mouse on '^' in notification frame we display this block"""
         frame_more_notif = tk.Label(self.notification_frame, text='See all notifications on website', bg='#e7e7e7',
                                     fg='#0f743a', font=('Helvetica', -15, 'underline'), cursor='hand2', padx=63, pady=20)
         frame_more_notif.bind("<Leave>", lambda event, h=frame_more_notif: h.place_forget())
         frame_more_notif.bind("<Button-1>", lambda event: webbrowser.open('http://yonchi.net.ua/login'))
         frame_more_notif.place(x=0, y=245)
 
-    def display_new_notification(self, text=''):
+    def display_new_notification(self, data):
+        """Display new field (block) in notification frame.
+
+        :param data : Notification instance from server.
+        """
         single_frame = tk.Frame(self.notification_frame, bg='#eae8e8', width=330, height=60)
+        single_frame.id = data['id']
         single_frame.place(x=1, y=self.single_notification_y_pos)
         self.single_notification_y_pos += 63
 
-        notif_text = tk.Label(single_frame, text=text, wraplength=300, bg='#eae8e8', justify='left')
+        notif_text = tk.Label(single_frame, text=data['text'], wraplength=300, bg='#eae8e8', justify='left', fg='#333333', font=('Helvetica', -12))
         notif_text.place(x=5, y=5)
+        notif_data = tk.Label(single_frame, text=data['created_at'].split('T')[0], wraplength=300, bg='#eae8e8', justify='left', fg='#6d6c6c', font=('Helvetica', -10))
+        notif_data.place(x=260, y=40)
         notif_read = tk.Label(single_frame, text='X', fg='red', bg='#eae8e8')
         notif_read.bind("<Button-1>", self.mark_as_read)
         notif_read.place(x=305, y=2)
 
     def mark_as_read(self, event):
+        """Mark as read some notification.
+
+        Note: We didn't update notification frame there!
+        Its doing in func - self.parent_window.base.send_to_server(msg)
+
+        """
         event.widget.master.destroy()
         self.single_notification_y_pos = 24
-        for wid in event.widget.master.master.winfo_children():
-            if wid.children.__len__() > 2:
-                wid.place_configure(x=1, y=self.single_notification_y_pos)
-                self.single_notification_y_pos += 63
+        msg = {
+            'stream': "notifications",
+            'payload': {
+                'action': "update",
+                'data': {
+                    'read': True
+                },
+                'pk': event.widget.master.id,
+                'token': self.parent_window.base.current_user['token']
+            }
+        }
+        self.parent_window.base.send_to_server(msg)
+
+    def update_counter(self, counter):
+        """Update counter on notifications.
+
+        :param counter : Count of unread notifications
+        """
+        notification_btn = self.parent_window.notification_btn
+        if counter > 0:
+            notification_btn.config(text=str(counter), bg='#10b858')
+            notification_btn.bind("<Enter>", lambda event, h=notification_btn: h.configure(bg="#0f743a"))
+            notification_btn.bind("<Leave>", lambda event, h=notification_btn: h.configure(bg="#10b858"))
+        else:
+            notification_btn = self.parent_window.notification_btn
+            notification_btn.config(text=str(counter), bg="#919191")
+            notification_btn.bind("<Enter>", lambda event, h=notification_btn: h.configure(bg="#c1c1c1"))
+            notification_btn.bind("<Leave>", lambda event, h=notification_btn: h.configure(bg="#919191"))
