@@ -1,8 +1,6 @@
 import json
 import subprocess
 from threading import Thread
-
-import time
 from websocket import WebSocketApp, enableTrace
 
 from ui.login_view import LoginView
@@ -20,8 +18,8 @@ class Base:
         self.views_frame = {}
         self.root = root
         self.version_app = '0.2'  # Change App version here!
-        self.api_server = 'http://127.0.0.1:8000'
-        # self.api_server = 'http://95.46.44.227'
+        # self.api_server = 'http://127.0.0.1:8000'
+        self.api_server = 'http://95.46.44.227'
 
     def change_view(self, to, data=None, back_to=None):
         self.to = to
@@ -119,7 +117,7 @@ class Base:
     def connection(self):
         """Its method just create websocket connection."""
         enableTrace(True)
-        self.ws = WebSocketApp("ws://127.0.0.1:8000/", on_message=self.on_message, on_error=self.on_error, on_close=self.on_close)
+        self.ws = WebSocketApp("ws://95.46.44.227/", on_message=self.on_message, on_error=self.on_error, on_close=self.on_close)
         self.ws.on_open = self.on_open
 
         self.ws.run_forever()

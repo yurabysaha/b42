@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import tkinter as tk
 import sys
 
