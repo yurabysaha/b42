@@ -532,13 +532,6 @@ class Connect(BaseMethod):
 
         :param: page_number -- int page number which we save
         """
-        # config = configparser.ConfigParser()
-        # config.read('config.ini')
-        # if not config.has_section('TASK'):
-        #     config.add_section('TASK')
-        # config['TASK'][str(self.view.data['id'])] = str(page_number)
-        # with open('config.ini', 'w') as configfile:
-        #     config.write(configfile)
 
         headers = {'content-type': 'application/json'}
 

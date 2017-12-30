@@ -80,7 +80,9 @@ class Base:
                 # When we receive data for notification we try update counter and notification block!
                 self.views_frame['TaskListView'].notification.update_counter(self.notifications_data.__len__())
                 self.views_frame['TaskListView'].notification.update_notification_block()
-
+        # If we get new value of points!
+        if response['stream'] == 'points':
+            self.views_frame['TaskListView'].update_point_counter(response['payload']['data']['points'])
         return
 
     def on_error(self, ws, error):
@@ -118,6 +120,7 @@ class Base:
         """Its method just create websocket connection."""
         enableTrace(True)
         self.ws = WebSocketApp("ws://95.46.44.227/", on_message=self.on_message, on_error=self.on_error, on_close=self.on_close)
+        # self.ws = WebSocketApp("ws://127.0.0.1:8000/", on_message=self.on_message, on_error=self.on_error, on_close=self.on_close)
         self.ws.on_open = self.on_open
 
         self.ws.run_forever()

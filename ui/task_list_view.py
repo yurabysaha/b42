@@ -17,6 +17,9 @@ class TaskListView:
 
         self.title_label = tk.Label(self.body, bg=MAIN_BG, text='TASKS LIST', font=('Helvetica', -16, "bold"))
         self.title_label.place(x=15, y=18)
+        # Points
+        self.points_label = tk.Label(self.body, bg=MAIN_BG, text='Points: %s' % self.base.current_user['user']['points'], font=('Helvetica', -14, "bold"))
+        self.points_label.place(x=420, y=18)
 
         # User profile and notifications
         self.my_profile_btn = tk.Label(self.body, text="MY PROFILE", bg="#919191", padx=40, pady=12, fg='white',
@@ -218,6 +221,10 @@ class TaskListView:
                 l.children['total_profiles'].config(text=str(count))
                 break
 
+    def update_point_counter(self, count):
+        """Update point count when we get new value from websocket"""
+        self.points_label.config(text='Points: %s' % count)
+
 
 class Notification:
     """This class have functionality for displaying notifications"""
@@ -325,6 +332,7 @@ class Notification:
 
         :param counter : Count of unread notifications
         """
+
         notification_btn = self.parent_window.notification_btn
         if counter > 0:
             notification_btn.config(text=str(counter), bg='#10b858')
