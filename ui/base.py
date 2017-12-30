@@ -82,7 +82,7 @@ class Base:
                 self.views_frame['TaskListView'].notification.update_notification_block()
         # If we get new value of points!
         if response['stream'] == 'points':
-            self.views_frame['TaskListView'].update_point_counter(response['payload']['data']['points'])
+            self.views_frame['TaskListView'].update_point_counter(response['payload']['data']['point'])
         return
 
     def on_error(self, ws, error):
