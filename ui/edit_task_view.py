@@ -39,6 +39,12 @@ class EditTaskView:
         self.url_input.bind("<Tab>", self.focus_next_input)
         self.url_input.bind("<Return>", self.validate_enter)
 
+        # Hint for Linkedin url
+        url_hint = tk.Label(self.body, bg='#e0ebeb', padx=2, text='?', fg='#12502d', font=('Helvetica', -9))
+        url_hint.bind("<Enter>", self.url_hint_show)
+        url_hint.bind("<Leave>", self.url_hint_hide)
+        url_hint.place(x=105, y=158)
+
         if task_data['linkedin_url']:
             self.url_input.insert(1.0, task_data['linkedin_url'])
         self.url_input.place(x=15, y=180)
@@ -106,3 +112,12 @@ class EditTaskView:
     def focus_next_input(self, event):
         event.widget.tk_focusNext().focus()
         return "break"
+
+    def url_hint_show(self, event):
+        self.url_hint_frame = tk.Frame(self.body, width=555, height=30, bg='#1a1a1a')
+        self.url_hint_frame.place(x=15, y=180)
+        hint_text = tk.Label(self.url_hint_frame, fg='white', bg='#1a1a1a', justify='left',  text="You should copy url from linkedin after you select all needs criteria on search page for your candidates")
+        hint_text.place(x=5, y=5)
+
+    def url_hint_hide(self, event):
+        self.url_hint_frame.place_forget()
