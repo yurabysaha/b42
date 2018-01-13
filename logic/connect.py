@@ -183,7 +183,7 @@ class Connect(BaseMethod):
                 text_field.send_keys(" ")
             else:
                 text_field.send_keys(self.view.data['connect_note_text'][0:299])
-            send_button = self.chrome.find_element_by_css_selector(".button-primary-large.ml3")
+            send_button = self.chrome.find_element_by_css_selector(".button-primary-large.ml1")
             if not send_button.is_enabled():
                 raise Exception
             send_button.click()
