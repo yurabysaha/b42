@@ -8,6 +8,7 @@ import datetime
 
 from logic.accept import Accept
 from logic.connect import Connect
+from logic.fast_connect import FastConnect
 from logic.forward_message import ForwardMessage
 from logic.message import Message
 
@@ -56,20 +57,21 @@ class TaskView:
         self.menu_connect.bind("<Button-1>", self.change_tab)
         self.menu_connect.place(x=160, y=0)
 
-        self.menu_accept = tk.Label(self.menu_frame, name='accept', bg='#f9fff9', text="ACCEPT", fg='#0f743a', padx=15, pady=8,
-                                    font=('Helvetica', -13, 'bold'))
-        self.menu_accept.bind("<Button-1>", self.change_tab)
-        self.menu_accept.place(x=260, y=0)
+        if self.data['task_type'] != 'fast':
+            self.menu_accept = tk.Label(self.menu_frame, name='accept', bg='#f9fff9', text="ACCEPT", fg='#0f743a', padx=15, pady=8,
+                                        font=('Helvetica', -13, 'bold'))
+            self.menu_accept.bind("<Button-1>", self.change_tab)
+            self.menu_accept.place(x=260, y=0)
 
-        self.menu_message = tk.Label(self.menu_frame,name='message', bg='#f9fff9', text="MESSAGE", fg='#0f743a', padx=15, pady=8,
-                                     font=('Helvetica', -13, 'bold'))
-        self.menu_message.bind("<Button-1>", self.change_tab)
-        self.menu_message.place(x=360, y=0)
+            self.menu_message = tk.Label(self.menu_frame,name='message', bg='#f9fff9', text="MESSAGE", fg='#0f743a', padx=15, pady=8,
+                                         font=('Helvetica', -13, 'bold'))
+            self.menu_message.bind("<Button-1>", self.change_tab)
+            self.menu_message.place(x=360, y=0)
 
-        self.menu_forward_mess = tk.Label(self.menu_frame, name='forward', bg='#f9fff9', text="FORWARD", fg='#0f743a', padx=15, pady=8,
-                                          font=('Helvetica', -13, 'bold'))
-        self.menu_forward_mess.bind("<Button-1>", self.change_tab)
-        self.menu_forward_mess.place(x=460, y=0)
+            self.menu_forward_mess = tk.Label(self.menu_frame, name='forward', bg='#f9fff9', text="FORWARD", fg='#0f743a', padx=15, pady=8,
+                                              font=('Helvetica', -13, 'bold'))
+            self.menu_forward_mess.bind("<Button-1>", self.change_tab)
+            self.menu_forward_mess.place(x=460, y=0)
 
         self.start_task_btn = tk.Label(self.body, bg='#10b858', text="START TASK", fg='white', padx=20, pady=10,
                                        font=('Helvetica', -14, 'bold'))
@@ -255,11 +257,14 @@ class TaskView:
     def add_new_profile(self, data):
         """Add new candidate profile with parsed data to our table.
 
-        :param: data -- candidate parsed data
+        :param: data -- candidate data
         :returns: created profile id or 'Already exist' - if this user already exist.
         """
         headers = {'content-type': 'application/json'}
-        data['task'] = self.data['id']
+        data.pop('element', None)
+        data = {'candidate': data, 'task': self.data['id']}
+        data['send_connect'] = data['candidate'].pop('send_connect', None)
+
         resp = self.base.user.post(self.base.api_server + "/api/candidate/", data=json.dumps(data),
                                    headers=headers)
         if resp.status_code == 201:
@@ -332,11 +337,12 @@ class TaskView:
                             bg=MAIN_BG)
         add_date.place(x=446, y=17)
 
-        browser_btn = tk.Label(line, text='in', fg='white', padx=1, pady=0, font=('Helvetica', -16, 'bold'), bg='#0077B7')
-        browser_btn.bind("<Button-1>", lambda event, url=line_data['candidate']['linkedin_url']: webbrowser.open(url))
-        browser_btn.bind("<Enter>", lambda event, h=browser_btn: h.configure(font=('Helvetica', -19, 'bold')))
-        browser_btn.bind("<Leave>", lambda event, h=browser_btn: h.configure(font=('Helvetica', -16, 'bold')))
-        browser_btn.place(x=678, y=17)
+        if line_data['candidate'].get('linkedin_url', None):
+            browser_btn = tk.Label(line, text='in', fg='white', padx=1, pady=0, font=('Helvetica', -16, 'bold'), bg='#0077B7')
+            browser_btn.bind("<Button-1>", lambda event, url=line_data['candidate']['linkedin_url']: webbrowser.open(url))
+            browser_btn.bind("<Enter>", lambda event, h=browser_btn: h.configure(font=('Helvetica', -19, 'bold')))
+            browser_btn.bind("<Leave>", lambda event, h=browser_btn: h.configure(font=('Helvetica', -16, 'bold')))
+            browser_btn.place(x=678, y=17)
 
         delete_btn = tk.Label(line, text='D', fg='#7a1000', font=('Helvetica', -17, 'bold'), bg=MAIN_BG)
         delete_btn.bind("<Button-1>", lambda event, jid=line_data: self.on_delete(data=jid['id']))
@@ -577,7 +583,10 @@ class ConnectOptions:
 
     def start_task(self, continue_from_page=None):
         self.window.process_log('Starting connect people..')
-        t = threading.Thread(target=Connect, args=(self.window, continue_from_page, ))
+        if self.window.data['task_type'] == 'fast':
+            t = threading.Thread(target=FastConnect, args=(self.window, continue_from_page, ))
+        else:
+            t = threading.Thread(target=Connect, args=(self.window, continue_from_page, ))
         t.start()
 
     def refresh_status(self):

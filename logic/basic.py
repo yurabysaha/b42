@@ -86,3 +86,20 @@ class BaseMethod:
                     timer -= 1
 
                 self.script_will_stop = self.script_will_stop + datetime.timedelta(minutes=self.every + self.period)
+
+    def security_check(self):
+        """Sometimes linkedin make auto logout. We check if this happen there."""
+        if 'https://www.linkedin.com/m/login' in self.chrome.current_url or 'https://www.linkedin.com/authwall' in self.chrome.current_url or 'captcha-v2' in self.chrome.current_url:
+            while 'https://www.linkedin.com/m/login' in self.chrome.current_url or 'https://www.linkedin.com/authwall' in self.chrome.current_url or 'captcha-v2' in self.chrome.current_url:
+                try:
+                    email = self.view.data['linkedin_email']
+                    password = self.view.data['linkedin_password']
+                    self.chrome.find_element_by_css_selector("input[type='text']").send_keys(email)
+                    self.chrome.find_element_by_css_selector("input[type='password']").send_keys(password)
+                    self.chrome.find_element_by_css_selector("input[type='submit']").click()
+                    time.sleep(1)
+                except:
+                    pass
+                self.view.process_log("Security problem. You need login manually")
+                time.sleep(2)
+            self.view.process_log("Try back to work...")

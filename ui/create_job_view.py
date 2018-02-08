@@ -58,6 +58,16 @@ class CreateJobView:
         self.password_input.bind("<Return>", self.validate_enter)
         self.password_input.place(x=15, y=338)
 
+        self.task_type_label = tk.Label(self.body, bg=MAIN_BG, fg='#12502d', text='TASK TYPE  (full or fast)',
+                                       font=('Helvetica', -12, "bold"))
+        self.task_type_label.place(x=15, y=394)
+        self.task_type_input = tk.Text(self.body, bg='#e6f1ea', borderwidth=1, padx=5, pady=10,
+                                      highlightbackground='#dddee1',
+                                      width=80, height=1, font=('Helvetica', -16))
+        self.task_type_input.bind("<Tab>", self.focus_next_input)
+        self.task_type_input.bind("<Return>", self.validate_enter)
+        self.task_type_input.place(x=15, y=417)
+
         self.create_task_btn = tk.Label(self.body, text="CREATE NEW TASK", bg="#10b858", padx=40, pady=12, fg='white',
                                         font=('Helvetica', -14, 'bold'))
         self.create_task_btn.bind("<Button-1>", self.create_task)
@@ -82,7 +92,8 @@ class CreateJobView:
                 "task_name": str(self.name_input.get(1.0, 'end')).rstrip(),
                 "linkedin_url": str(self.url_input.get(1.0, 'end')).rstrip(),
                 "linkedin_email": str(self.email_input.get(1.0, 'end')).rstrip(),
-                "linkedin_password": str(self.password_input.get(1.0, 'end')).rstrip()
+                "linkedin_password": str(self.password_input.get(1.0, 'end')).rstrip(),
+                "task_type": str(self.task_type_input.get(1.0, 'end')).rstrip()
                 }
         try:
             resp = self.base.user.post(self.base.api_server + "/api/tasks/", data=json.dumps(data), headers=headers)
@@ -102,6 +113,7 @@ class CreateJobView:
         self.url_input.delete(1.0, 'end')
         self.email_input.delete(1.0, 'end')
         self.password_input.delete(1.0, 'end')
+        self.task_type_input.delete(1.0, 'end')
 
     def focus_next_input(self, event):
         event.widget.tk_focusNext().focus()
