@@ -10,6 +10,7 @@ class CreateJobView:
     def __init__(self, base):
         self.base = base
         self.body = tk.Frame(self.base.root, bg=MAIN_BG)
+        self.selected_task_type = 'full'
 
         self.base.views_frame['CreateJobView'] = self
         self.body.place(x=0, y=0, width=768, height=680)
@@ -58,15 +59,17 @@ class CreateJobView:
         self.password_input.bind("<Return>", self.validate_enter)
         self.password_input.place(x=15, y=338)
 
-        self.task_type_label = tk.Label(self.body, bg=MAIN_BG, fg='#12502d', text='TASK TYPE  (full or fast)',
+        self.task_type_label = tk.Label(self.body, bg=MAIN_BG, fg='#12502d', text='CHOOSE TASK TYPE',
                                        font=('Helvetica', -12, "bold"))
         self.task_type_label.place(x=15, y=394)
-        self.task_type_input = tk.Text(self.body, bg='#e6f1ea', borderwidth=1, padx=5, pady=10,
-                                      highlightbackground='#dddee1',
-                                      width=80, height=1, font=('Helvetica', -16))
-        self.task_type_input.bind("<Tab>", self.focus_next_input)
-        self.task_type_input.bind("<Return>", self.validate_enter)
-        self.task_type_input.place(x=15, y=417)
+
+        self.task_type_full = tk.Label(self.body, name='full', bg=MAIN_BG, text='[x] - FULL', fg='#0f743a', font=('Helvetica', -14, 'bold'))
+        self.task_type_full.bind("<Button-1>", self.choose_task_type)
+        self.task_type_full.place(x=15, y=417)
+
+        self.task_type_fast = tk.Label(self.body, name='fast', bg=MAIN_BG, text='[ ] - FAST', fg='#0f743a', font=('Helvetica', -14, 'bold'))
+        self.task_type_fast.bind("<Button-1>", self.choose_task_type)
+        self.task_type_fast.place(x=100, y=417)
 
         self.create_task_btn = tk.Label(self.body, text="CREATE NEW TASK", bg="#10b858", padx=40, pady=12, fg='white',
                                         font=('Helvetica', -14, 'bold'))
@@ -93,7 +96,7 @@ class CreateJobView:
                 "linkedin_url": str(self.url_input.get(1.0, 'end')).rstrip(),
                 "linkedin_email": str(self.email_input.get(1.0, 'end')).rstrip(),
                 "linkedin_password": str(self.password_input.get(1.0, 'end')).rstrip(),
-                "task_type": str(self.task_type_input.get(1.0, 'end')).rstrip()
+                "task_type": self.selected_task_type
                 }
         try:
             resp = self.base.user.post(self.base.api_server + "/api/tasks/", data=json.dumps(data), headers=headers)
@@ -113,7 +116,6 @@ class CreateJobView:
         self.url_input.delete(1.0, 'end')
         self.email_input.delete(1.0, 'end')
         self.password_input.delete(1.0, 'end')
-        self.task_type_input.delete(1.0, 'end')
 
     def focus_next_input(self, event):
         event.widget.tk_focusNext().focus()
@@ -127,3 +129,13 @@ class CreateJobView:
 
     def url_hint_hide(self, event):
         self.url_hint_frame.place_forget()
+
+    def choose_task_type(self, event):
+        if event.widget.winfo_name() == 'fast':
+            event.widget.config(text='[X] - FAST')
+            self.task_type_full.config(text='[ ] - FULL')
+            self.selected_task_type = 'fast'
+        elif event.widget.winfo_name() == 'full':
+            event.widget.config(text='[X] - FULL')
+            self.task_type_fast.config(text='[ ] - FAST')
+            self.selected_task_type = 'full'
