@@ -141,7 +141,14 @@ class FastConnect(BaseMethod):
             if not send_button.is_enabled():
                 raise Exception
             send_button.click()
-            time.sleep(1)
+            time.sleep(2)
+            # Sometimes linkedin dint close modal window after send connect. So we try close him in such situation
+            try:
+                self.chrome.find_element_by_xpath("//button[@name='cancel']").click()
+                time.sleep(1)
+            except:
+                pass
+
             return True
         except:
             return False
