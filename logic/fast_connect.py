@@ -25,7 +25,7 @@ class FastConnect(BaseMethod):
 
                 for p in candidates_list:
                     if self.max_connect_today > 0:
-                        if self.click_connect_person(p['element']):
+                        if self.click_connect_person(p):
                             self.max_connect_today -= 1
                             p['send_connect'] = True
                         self.view.add_new_profile(data=p)
@@ -111,15 +111,15 @@ class FastConnect(BaseMethod):
         except:
             pass
 
-    def click_connect_person(self, element):
+    def click_connect_person(self, line):
         """Try send current user connect request.
 
         :return: True - if connect successful or False - if cant connect
         """
         try:
-            self._scroll_to_element(element)
+            self._scroll_to_element(line['element'])
 
-            connect_button = element.find_element_by_css_selector(".button-secondary-medium")
+            connect_button = line['element'].find_element_by_css_selector(".button-secondary-medium")
             connect_button.click()
 
             time.sleep(1)
@@ -136,7 +136,9 @@ class FastConnect(BaseMethod):
             if not self.view.data['connect_note_text']:
                 text_field.send_keys(" ")
             else:
-                text_field.send_keys(self.view.data['connect_note_text'][0:299])
+                text_after_format = self.get_formatted_text_for_message(full_name=line['full_name'],
+                                                                        text=self.view.data['connect_note_text'][0:299])
+                text_field.send_keys(text_after_format)
             send_button = self.chrome.find_element_by_css_selector(".button-primary-large.ml1")
             if not send_button.is_enabled():
                 raise Exception

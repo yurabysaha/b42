@@ -28,7 +28,7 @@ class Connect(BaseMethod):
                     if not parsed_profile:
                         continue
                     if self.max_connect_today > 0:
-                        if self.connect_person():
+                        if self.connect_person(full_name=p['full_name']):
                             self.max_connect_today -= 1
                             parsed_profile['send_connect'] = True
                         self.view.add_new_profile(data=parsed_profile)
@@ -133,9 +133,11 @@ class Connect(BaseMethod):
         except:
             pass
 
-    def connect_person(self):
+    def connect_person(self, full_name):
         """Try send current user connect request.
 
+
+        :param full_name: String - Candidate full name
         :return: True - if connect successful or False - if cant connect
         """
         try:
@@ -182,7 +184,9 @@ class Connect(BaseMethod):
             if not self.view.data['connect_note_text']:
                 text_field.send_keys(" ")
             else:
-                text_field.send_keys(self.view.data['connect_note_text'][0:299])
+                text_after_format = self.get_formatted_text_for_message(full_name=full_name,
+                                                                        text=self.view.data['connect_note_text'][0:299])
+                text_field.send_keys(text_after_format)
             send_button = self.chrome.find_element_by_css_selector(".button-primary-large.ml1")
             if not send_button.is_enabled():
                 raise Exception

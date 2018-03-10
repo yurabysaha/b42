@@ -11,7 +11,7 @@ sys.stderr = open('error.log', 'w')
 sys.stdout = open('output.log', 'w')
 
 root = tk.Tk()
-root.title('YOnchi v 0.3')
+root.title('YOnchi v 0.2.7')
 # root.iconbitmap(default='img/logo.ico')
 root.configure(background=MAIN_BG)
 root.resizable(width=False, height=False)

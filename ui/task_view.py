@@ -503,7 +503,8 @@ class ConnectOptions:
         self.window.option_btn.config(text='OPTIONS -')
         self.window.option_btn.config(text='    SAVE    ')
         self.window.start_task_btn.place_forget()
-        message_note_label = tk.Label(self.options_frame, text='Message for connect with note', fg='#12502d', font=('Helvetica', -13), bg='#f9fff9')
+        message_note_label = tk.Label(self.options_frame, text='Message for connect with note         {first_name} - Change to first name,   {full_name} - Change to full name',
+                                      fg='#12502d', font=('Helvetica', -13), bg='#f9fff9')
         message_note_label.place(x=15, y=1)
 
         self.count_label = tk.Label(self.options_frame, bg='#f9fff9', text='0/300', font=('Helvetica', -14, "bold"))
@@ -533,6 +534,8 @@ class ConnectOptions:
         max_connect_label = tk.Label(self.options_frame, text='MAX send connect to', fg='#12502d', bg='#f9fff9', font=('Helvetica', -13))
         max_connect_label.place(x=200, y=167)
         self.max_connect_entry = tk.Entry(self.options_frame, width=5, font=('Helvetica', -17, 'bold'))
+        if self.window.data['max_send_connect']:
+            self.max_connect_entry.insert(0, self.window.data['max_send_connect'])
         self.max_connect_entry.place(x=340, y=167)
 
         self.window.option_btn.bind("<Button-1>", self.save_data)

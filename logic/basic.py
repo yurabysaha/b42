@@ -103,3 +103,15 @@ class BaseMethod:
                 self.view.process_log("Security problem. You need login manually")
                 time.sleep(2)
             self.view.process_log("Try back to work...")
+
+    def get_formatted_text_for_message(self, full_name, text):
+        """Insert first_name or full_name into message text.
+
+        :return new_text - Text after inserting
+        """
+        splitted_name = full_name.split(' ')
+        if '.' in splitted_name[0]:
+            splitted_name[0] = splitted_name[0] + ' ' + splitted_name[1]
+        first_name = splitted_name[0].title()
+        new_text = text.replace('{full_name}', full_name).replace('{first_name}', first_name)
+        return new_text
