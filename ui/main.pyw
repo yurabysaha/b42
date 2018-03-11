@@ -22,3 +22,6 @@ base = Base(root)
 if __name__ == "__main__":
     LoginView(base)
     root.mainloop()
+
+# IF you want disable chromedriver console. See my answer on stackoverflow
+# https://stackoverflow.com/a/49219290/9085469
