@@ -23,6 +23,6 @@ ruamel.yaml==0.15.34
 selenium==3.8.0
 six==1.11.0
 tzlocal==1.4
-urllib3==1.22
+urllib3==1.26.5
 websocket-client==0.44.0
 Werkzeug==0.12.2
